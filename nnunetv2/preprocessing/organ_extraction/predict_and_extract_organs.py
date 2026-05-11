@@ -1,7 +1,10 @@
 import os
 import sys
-import SimpleITK as sitk
+from pathlib import Path
+
 import numpy as np
+import SimpleITK as sitk
+
 
 in_dir = "imagesTr"
 lbl_dir = "labelsTr"
@@ -34,12 +37,22 @@ lbl_mapping_head = {
 }
 
 if __name__ == "__main__":
-    cases = os.listdir(in_dir)
-    cases = [case for case in cases if case.endswith("0000.nii.gz")]
-    for case in cases:
-        case_path = os.path.join(in_dir, case)
-        out_path_all = os.path.join(out_dir, case.split("_0000")[0] + "_all.nii.gz")
-        out_path_head = os.path.join(out_dir, case.split("_0000")[0] + "_head.nii.gz")
+    if len(sys.argv) < 2:
+        RootPath = "."
+    else:
+        RootPath = sys.argv[1]
+
+    InFolderPath = "%s/%s" % (RootPath, in_dir)
+    OutFolderPath = "%s/%s" % (RootPath, out_dir)
+    # Create folder(s) if they don't exist
+    Path(OutFolderPath).mkdir(parents=True, exist_ok=True)
+
+    cases = os.listdir(InFolderPath)
+    cases = [c for c in cases if c.endswith("0000.nii.gz")]
+    for c in cases:
+        case_path = os.path.join(InFolderPath, c)
+        out_path_all = os.path.join(OutFolderPath, c.split("_0000")[0] + "_all.nii.gz")
+        out_path_head = os.path.join(OutFolderPath, c.split("_0000")[0] + "_head.nii.gz")
 
         # Check if the output files already exist
         if os.path.exists(out_path_all) and os.path.exists(out_path_head):
@@ -49,7 +62,7 @@ if __name__ == "__main__":
         os.system(command)
         command = f"TotalSegmentator -i '{case_path}' -o '{out_path_head}' -ta head_glands_cavities --ml"
         os.system(command)
-
+    
         # Load the total segmentation labels
         lbl_all_img = sitk.ReadImage(out_path_all)
         lbl_all = sitk.GetArrayFromImage(lbl_all_img)
@@ -68,7 +81,7 @@ if __name__ == "__main__":
         # Save the combined labels
         lbl_combined_img = sitk.GetImageFromArray(lbl_combined)
         lbl_combined_img.CopyInformation(lbl_all_img)
-        out_path_combined = os.path.join(combined_dir, case.split("_0000")[0] + ".nii.gz")
+        out_path_combined = os.path.join("%s/%s" % (RootPath, combined_dir), c.split("_0000")[0] + ".nii.gz")
         sitk.WriteImage(lbl_combined_img, out_path_combined)
 
         print(f"Finished processing {case_path}")
