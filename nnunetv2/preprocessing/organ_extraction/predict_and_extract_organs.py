@@ -44,8 +44,10 @@ if __name__ == "__main__":
 
     InFolderPath = "%s/%s" % (RootPath, in_dir)
     OutFolderPath = "%s/%s" % (RootPath, out_dir)
+    CombinedFolderPath = "%s/%s" % (RootPath, combined_dir)
     # Create folder(s) if they don't exist
     Path(OutFolderPath).mkdir(parents=True, exist_ok=True)
+    Path(CombinedFolderPath).mkdir(parents=True, exist_ok=True)
 
     cases = os.listdir(InFolderPath)
     cases = [c for c in cases if c.endswith("0000.nii.gz")]
@@ -81,7 +83,7 @@ if __name__ == "__main__":
         # Save the combined labels
         lbl_combined_img = sitk.GetImageFromArray(lbl_combined)
         lbl_combined_img.CopyInformation(lbl_all_img)
-        out_path_combined = os.path.join("%s/%s" % (RootPath, combined_dir), c.split("_0000")[0] + ".nii.gz")
+        out_path_combined = os.path.join(CombinedFolderPath, c.split("_0000")[0] + ".nii.gz")
         sitk.WriteImage(lbl_combined_img, out_path_combined)
-
+        
         print(f"Finished processing {case_path}")
