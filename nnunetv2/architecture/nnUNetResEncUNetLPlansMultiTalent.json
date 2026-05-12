@@ -1,5 +1,5 @@
 {
-    "dataset_name": "Dataset222_AutoPETIII_2024",
+    "dataset_name": "Dataset003_PSMA-PET-CT-Lesions_v3",
     "plans_name": "nnUNetResEncUNetLPlansMultiTalent",
     "original_median_spacing_after_transp": [
         3.0,
